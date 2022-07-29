@@ -9,8 +9,8 @@ export const TemplatesProvider = ({children}) => {
     const [ templates, setTemplates ] = useState([]);
     const [ isFetching, setIsFetching ] = useState(true);
 
-    const getTemplates = async (keywords) => {
-        const q = query(collection(db, "templates"), where("tags", "array-contains-any", keywords));
+    const getTemplates = async (key, condition, value) => {
+        const q = query(collection(db, "templates"), where(key, condition, value));
         const querySnapshot = await getDocs(q);
         setIsFetching(false);
 

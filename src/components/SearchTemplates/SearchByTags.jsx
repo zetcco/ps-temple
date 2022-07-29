@@ -23,7 +23,7 @@ function SearchByTags() {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        getTemplates(searchTags);
+        getTemplates("tags", "array-contains-any", searchTags);
     }
     return(
         <div>
