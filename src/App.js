@@ -14,19 +14,22 @@ import MyUploads from './routes/MyUploads';
 import SignInPage from './routes/SignInPage';
 import TemplatePage from './routes/TemplatePage';
 import UploadTemplatePage from './routes/UploadTemplatePage';
+import { TemplatesProvider } from './context/templates/TemplatesContext';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Navbar/>
-        <Routes>
-          <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
-          <Route path="/signin" element={<SignInPage/>}/>
-          <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
-          <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
-          <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
-        </Routes>
+        <TemplatesProvider>
+          <Navbar/>
+          <Routes>
+            <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
+            <Route path="/signin" element={<SignInPage/>}/>
+            <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
+            <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
+            <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
+          </Routes>
+        </TemplatesProvider>
       </AuthProvider>
     </BrowserRouter>
   );

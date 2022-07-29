@@ -1,6 +1,14 @@
+import { useContext } from "react";
+import SearchByTags from "../components/SearchTemplates/SearchByTags";
+import TemplateResults from "../components/SearchTemplates/TemplateResults";
+
 function ExplorePage() {
+
     return(
-        <div>Explore</div>
+        <div>
+            <SearchByTags/>
+            <TemplateResults/>
+        </div>
     );
 }
 
