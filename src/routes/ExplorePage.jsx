@@ -4,7 +4,7 @@ import TemplateResults from "../components/SearchTemplates/TemplateResults";
 function ExplorePage() {
 
     return(
-        <div>
+        <div className="my-10">
             <SearchByTags/>
             <TemplateResults/>
         </div>
