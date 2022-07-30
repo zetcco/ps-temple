@@ -25,7 +25,7 @@ export const TemplatesProvider = ({children}) => {
     }
 
     return (
-        <TemplatesContext.Provider value={{ templates, isFetching, getTemplates }}>
+        <TemplatesContext.Provider value={{ templates, isFetching, setTemplates, getTemplates }}>
             {children}
         </TemplatesContext.Provider>
     )
