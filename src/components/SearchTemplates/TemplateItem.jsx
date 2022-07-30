@@ -1,9 +1,11 @@
 import Tag from '../Tag';
+import { Link } from 'react-router-dom';
 
 function TemplateItem({ template }) {
     const imgPlaceholders = ["animals", "arch", "nature", "people", "tech", "grayscale", "sepia"]
     console.log();
     return (
+    <Link to={`/template/${template.id}`}>
         <div className="card w-96 bg-base-100 shadow-xl" key={template.id}>
             <figure><img src={ `https://placeimg.com/400/225/${imgPlaceholders[Math.floor(Math.random()*(imgPlaceholders.length - 1))]}` } alt="Shoes"/></figure>
             <div className="card-body">
@@ -21,6 +23,7 @@ function TemplateItem({ template }) {
                 </div>
             </div>
         </div>
+    </Link>
     )
 }
 
