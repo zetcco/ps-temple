@@ -31,11 +31,17 @@ function SignInPage() {
         )
     }
     return (
-        <div>
+        <div className="mx-auto w-2/5">
             <form onSubmit={onSubmit}>
-                <input type='text' id='email' value={formData.email} onChange={onChange}/>
-                <input type='password' id='password' value={formData.password} onChange={onChange}/>
-                <button type='submit'>Sign In</button>
+                <label className="label">
+                    <span className="label-text">Enter your email</span>
+                </label>
+                <input type="text" placeholder="Type here" className="input input-bordered w-full" id='email' value={formData.email} onChange={onChange} required/>
+                <label className="label">
+                    <span className="label-text">Enter your password</span>
+                </label>
+                <input type="password" placeholder="Type here" className="input input-bordered w-full" id='password' value={formData.password} onChange={onChange} required/>
+                <button className="btn btn-primary btn-block mt-5" type="submit">Sign In</button>
             </form>
         </div>
     );
