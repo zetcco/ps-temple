@@ -7,12 +7,12 @@ const TemplatesContext = createContext();
 export const TemplatesProvider = ({children}) => {
 
     const [ templates, setTemplates ] = useState([]);
-    const [ isFetching, setIsFetching ] = useState(true);
+    const [ isFetching, setIsFetching ] = useState(false);
 
     const getTemplates = async (key, condition, value) => {
+        setIsFetching(true);
         const q = query(collection(db, "templates"), where(key, condition, value));
         const querySnapshot = await getDocs(q);
-        setIsFetching(false);
 
         const templates = [];
         querySnapshot.forEach( (doc) => {
@@ -22,6 +22,7 @@ export const TemplatesProvider = ({children}) => {
             })
         } )
         setTemplates(templates);
+        setIsFetching(false);
     }
 
     return (

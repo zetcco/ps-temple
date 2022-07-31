@@ -13,7 +13,7 @@ function PrivateRoute({ children, redirect }) {
     }
 
     // If user is not currently logged in, Redirect to sign in page
-    if (!authenticatedUser) {
+    if (!authenticatedUser && !checkingStatus) {
         return <Navigate to="/signin" state={ {from: location} } replace/>
     }
 

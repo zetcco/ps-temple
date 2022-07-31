@@ -10,7 +10,7 @@ function SearchByTags() {
 
     const onKeyUp = (e) => {
         if (e.key === ',') {
-            setSearchTags([ ...searchTags, e.target.value.slice(0, -1)]);
+            setSearchTags([ ...searchTags, e.target.value.slice(0, -1).trim()]);
             e.target.value = '';
         }
     }

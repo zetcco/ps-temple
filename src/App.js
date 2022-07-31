@@ -16,26 +16,29 @@ import SignInPage from './routes/SignInPage';
 import TemplatePage from './routes/TemplatePage';
 import UploadTemplatePage from './routes/UploadTemplatePage';
 import { TemplatesProvider } from './context/templates/TemplatesContext';
+import UserProvider from './context/user/UserContext';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <TemplatesProvider>
-          <div className='flex flex-col justify-between h-screen'>
-            <Navbar/>
-            <div className='container mx-auto px-4 pb-12'>
-              <Routes>
-                <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
-                <Route path="/signin" element={<SignInPage/>}/>
-                <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
-                <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
-                <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
-              </Routes>
+        <UserProvider>
+          <TemplatesProvider>
+            <div className='flex flex-col justify-between h-screen'>
+              <Navbar/>
+              <div className='container mx-auto px-4 pb-12'>
+                <Routes>
+                  <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
+                  <Route path="/signin" element={<SignInPage/>}/>
+                  <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
+                  <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
+                  <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
+                </Routes>
+              </div>
+              <Footer/>
             </div>
-            <Footer/>
-          </div>
-        </TemplatesProvider>
+          </TemplatesProvider>
+        </UserProvider>
       </AuthProvider>
     </BrowserRouter>
   );

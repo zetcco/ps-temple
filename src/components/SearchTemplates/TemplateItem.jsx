@@ -6,7 +6,7 @@ function TemplateItem({ template }) {
     return (
         <div className="card bg-base-100 shadow-xl m-3" key={template.id}>
             <Link to={`/template/${template.id}`}>
-                <figure><img src={ `https://placeimg.com/400/225/${imgPlaceholders[Math.floor(Math.random()*(imgPlaceholders.length - 1))]}` } alt="Shoes"/></figure>
+                <figure><img src={template.data.imageUrls[0]} alt="Shoes"/></figure>
             </Link>
             <div className="card-body">
                 <h2 className="card-title">

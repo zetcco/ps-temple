@@ -4,23 +4,22 @@ import TemplateItem from "./TemplateItem";
 
 function TemplateResults() {
 
-    const { templates } = useContext(TemplatesContext);
+    const { templates, isFetching } = useContext(TemplatesContext);
 
-    return (
-        <div className="xl:columns-4 lg:columns-3 md:columns-2 sm:columns-1 gap-0 mt-10">
-            {(templates.length !== 0) ? (
-                templates.map((template, index) => {
-                    return (
-                        <TemplateItem template={template} key={index}/>
-                    )
-                })
-            ) : (
-                <h3>
-                    No listing
-                </h3>
-            )}
-        </div>
-    );
+    if (isFetching) {
+        return (<div>Loading...</div>)
+    } else {
+        return (
+            <div className="xl:columns-4 lg:columns-3 md:columns-2 sm:columns-1 gap-0 mt-10">
+                {templates.map((template, index) => {
+                        return (
+                            <TemplateItem template={template} key={index}/>
+                        )
+                    })
+                }
+            </div>
+        );
+    }
 }
 
 export default TemplateResults;

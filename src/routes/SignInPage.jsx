@@ -8,13 +8,16 @@ function SignInPage() {
         email: '',
         password: ''
     })
+    const [isLoading, setIsLoading] = useState(false);
 
     const { signin, authenticatedUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const onSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         await signin(formData.email, formData.password);
+        setIsLoading(false);
         navigate('/');
     }
 
@@ -41,7 +44,13 @@ function SignInPage() {
                     <span className="label-text">Enter your password</span>
                 </label>
                 <input type="password" placeholder="Type here" className="input input-bordered w-full" id='password' value={formData.password} onChange={onChange} required/>
-                <button className="btn btn-primary btn-block mt-5" type="submit">Sign In</button>
+                {isLoading === false ? 
+                    (
+                        <button className="btn btn-primary btn-block mt-5 w-full" type="submit">Sign In</button>
+                    ) : (
+                        <button className="btn loading mt-5 w-full">Signing In</button>
+                    )
+                }
             </form>
         </div>
     );
