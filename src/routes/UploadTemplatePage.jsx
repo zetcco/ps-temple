@@ -8,14 +8,15 @@ import { db } from '../firebase.config';
 
 function UploadTemplatePage() {
 
-    const [formData, setFormData] = useState({
+    const initialFormData =  {
         title: '',
         tags: [],
         imageFiles: [],
         psdFiles: [],
+        gdriveLink: '',
         uploadTime: serverTimestamp()
-    });
-
+    }
+    const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (e) => {
@@ -49,9 +50,11 @@ function UploadTemplatePage() {
         delete submitData.imageFiles;
         delete submitData.psdFiles;
 
+        console.log(submitData);
         await addDoc(collection(db, "templates"), submitData);
 
         setIsLoading(false);
+        setFormData(initialFormData);
     }
 
     // Upload a sinfle file to the Firebase storage
@@ -125,11 +128,11 @@ function UploadTemplatePage() {
                 <label className="label">
                     <span className="label-text">Enter Template Title</span>
                 </label>
-                <input type="text" placeholder="Type here" className="input input-bordered w-full" id='title' onChange={onMutate} required/>
+                <input type="text" placeholder="Type here" className="input input-bordered w-full" id='title' onChange={onMutate} value={formData.title} required/>
                 <label className="label">
                     <span className="label-text">Enter Template tags</span>
                 </label>
-                <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} required/>
+                <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} value={formData.tags} required/>
                 <label className="label">
                     <span className="label-text">Upload images</span>
                 </label>
@@ -170,7 +173,7 @@ function UploadTemplatePage() {
                 <label className="label">
                     <span className="label-text">Google Drive URL</span>
                 </label>
-                <input type="text" placeholder="Paste URL here" className="input input-bordered w-full" id='gdrive' onChange={onMutate}/>
+                <input type="text" placeholder="Paste URL here" className="input input-bordered w-full" id='gdrive' value={formData.gdriveLink} onChange={onMutate}/>
 
                 {isLoading === false ? 
                     (
