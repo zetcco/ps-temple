@@ -1,5 +1,7 @@
 // Libraries
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Contexts 
 import { AuthProvider } from './context/authentication/AuthProvider';
@@ -20,27 +22,30 @@ import UserProvider from './context/user/UserContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <UserProvider>
-          <TemplatesProvider>
-            <div className='flex flex-col justify-between h-screen'>
-              <Navbar/>
-              <div className='container mx-auto px-4 pb-12'>
-                <Routes>
-                  <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
-                  <Route path="/signin" element={<SignInPage/>}/>
-                  <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
-                  <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
-                  <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
-                </Routes>
+    < >
+      <BrowserRouter>
+        <AuthProvider>
+          <UserProvider>
+            <TemplatesProvider>
+              <div className='flex flex-col justify-between h-screen'>
+                <Navbar/>
+                <div className='container mx-auto px-4 pb-12'>
+                  <Routes>
+                    <Route path="/" element={<PrivateRoute><ExplorePage/></PrivateRoute>}/>
+                    <Route path="/signin" element={<SignInPage/>}/>
+                    <Route path="/template/:id" element={<PrivateRoute><TemplatePage/></PrivateRoute>}/>
+                    <Route path="/upload" element={<PrivateRoute><UploadTemplatePage/></PrivateRoute>}/>
+                    <Route path="/myuploads" element={<PrivateRoute><MyUploads/></PrivateRoute>}/>
+                  </Routes>
+                </div>
+                <Footer/>
               </div>
-              <Footer/>
-            </div>
-          </TemplatesProvider>
-        </UserProvider>
-      </AuthProvider>
-    </BrowserRouter>
+            </TemplatesProvider>
+          </UserProvider>
+        </AuthProvider>
+      </BrowserRouter>
+      <ToastContainer/>
+    </ >
   );
 }
 

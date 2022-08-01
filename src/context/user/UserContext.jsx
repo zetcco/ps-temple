@@ -12,9 +12,12 @@ export const UserProvider = ({children}) => {
 
     useEffect(() => {
         ( async () => {
-            const docRef = doc(db, "users", authenticatedUser.uid);
-            const docSnap = await getDoc(docRef);
-            console.log(docSnap.data());
+            try {
+                const docRef = doc(db, "users", authenticatedUser.uid);
+                const docSnap = await getDoc(docRef);
+                console.log(docSnap.data());
+            } catch (error) {
+            }
         })()
     }, [authenticatedUser]);
     

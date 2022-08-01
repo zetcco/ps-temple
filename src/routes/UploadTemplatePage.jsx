@@ -5,6 +5,7 @@ import { auth, storage } from '../firebase.config';
 import { v4 as uuidv4 } from 'uuid';
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '../firebase.config';
+import { toast } from 'react-toastify';
 
 function UploadTemplatePage() {
 
@@ -24,34 +25,39 @@ function UploadTemplatePage() {
 
         setIsLoading(true);
 
-        // Upload the images
-        const imageUrls = await Promise.all(
-            [...formData.imageFiles].map( (image) => uploadFile(image, 'images'))
-        ).catch( () => {
-            console.log('Images did not upload');
-            return;
-        }) 
+        try { 
+            // Upload the images
+            const imageUrls = await Promise.all(
+                [...formData.imageFiles].map( (image) => uploadFile(image, 'images'))
+            ).catch( () => {
+                console.log('Images did not upload');
+                return;
+            }) 
 
-        // Upload the images
-        const psdUrl = formData.psdFiles.length > 0 ? await uploadFile(formData.psdFiles[0], 'psds').catch( () => {
-            console.log('PSD did not upload');
-            return;
-        }) : '';
+            // Upload the images
+            const psdUrl = formData.psdFiles.length > 0 ? await uploadFile(formData.psdFiles[0], 'psds').catch( () => {
+                console.log('PSD did not upload');
+                return;
+            }) : '';
 
-        // Set other required data
-        const submitData = {
-            ...formData,
-            tags: formData.tags.split(",").map((tag) => (tag.trim())),
-            uploadedBy: auth.currentUser.uid,
-            imageUrls,
-            psdUrl
+            // Set other required data
+            const submitData = {
+                ...formData,
+                tags: formData.tags.split(",").map((tag) => (tag.trim())),
+                uploadedBy: auth.currentUser.uid,
+                imageUrls,
+                psdUrl
+            }
+
+            delete submitData.imageFiles;
+            delete submitData.psdFiles;
+
+            await addDoc(collection(db, "templates"), submitData);
+
+            toast.success('Submission successful');
+        } catch (error) {
+            toast.error('Error submitting template');
         }
-
-        delete submitData.imageFiles;
-        delete submitData.psdFiles;
-
-        console.log(submitData);
-        await addDoc(collection(db, "templates"), submitData);
 
         setIsLoading(false);
         setFormData(initialFormData);
