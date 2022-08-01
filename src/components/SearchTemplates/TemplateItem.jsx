@@ -2,7 +2,6 @@ import Tag from '../Tag';
 import { Link } from 'react-router-dom';
 
 function TemplateItem({ template }) {
-    const imgPlaceholders = ["animals", "arch", "nature", "people", "tech", "grayscale", "sepia"]
     return (
         <div className="card bg-base-100 shadow-xl m-3" key={template.id}>
             <Link to={`/template/${template.id}`}>

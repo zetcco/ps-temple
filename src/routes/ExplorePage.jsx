@@ -9,7 +9,7 @@ function ExplorePage() {
 
     useEffect(() => {
         setTemplates([]);
-    }, []);
+    }, [setTemplates]);
 
     return(
         <div className="my-10">

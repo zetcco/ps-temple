@@ -15,7 +15,6 @@ export const UserProvider = ({children}) => {
             try {
                 const docRef = doc(db, "users", authenticatedUser.uid);
                 const docSnap = await getDoc(docRef);
-                console.log(docSnap.data());
             } catch (error) {
             }
         })()
