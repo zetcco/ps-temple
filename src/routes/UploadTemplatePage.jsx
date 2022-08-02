@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
+import Resizer from "react-image-file-resizer";
 
 function UploadTemplatePage() {
 
@@ -27,8 +28,14 @@ function UploadTemplatePage() {
 
         try { 
             // Upload the images
+            const resizedImages = await Promise.all([...formData.imageFiles].map(
+                (image) => resizeFile(image)
+            ));
+            const convertedImages = await Promise.all(resizedImages.map(
+                (image) => dataURIToBlob(image)
+            ));
             const imageUrls = await Promise.all(
-                [...formData.imageFiles].map( (image) => uploadFile(image, 'images'))
+                convertedImages.map( (image) => uploadFile(image, 'images'))
             ).catch( () => {
                 console.log('Images did not upload');
                 return;
@@ -43,7 +50,7 @@ function UploadTemplatePage() {
             // Set other required data
             const submitData = {
                 ...formData,
-                tags: formData.tags.split(",").map((tag) => (tag.trim())),
+                tags: formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())),
                 uploadedBy: auth.currentUser.uid,
                 imageUrls,
                 psdUrl
@@ -56,12 +63,25 @@ function UploadTemplatePage() {
 
             toast.success('Submission successful');
         } catch (error) {
+            console.log(error);
             toast.error('Error submitting template');
         }
 
         setIsLoading(false);
         setFormData(initialFormData);
     }
+
+    const dataURIToBlob = (dataURI) => {
+        const splitDataURI = dataURI.split(",");
+        const byteString =
+        splitDataURI[0].indexOf("base64") >= 0
+            ? atob(splitDataURI[1])
+            : decodeURI(splitDataURI[1]);
+        const mimeString = splitDataURI[0].split(":")[1].split(";")[0];
+        const ia = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        return new Blob([ia], { type: mimeString });
+    };
 
     // Upload a sinfle file to the Firebase storage
     const uploadFile = async (file, type) => {
@@ -90,7 +110,7 @@ function UploadTemplatePage() {
         });
     }
 
-    const onMutate = (e) => {
+    const onMutate = async (e) => {
         switch (e.target.id) { 
             case 'tags':
                 setFormData({
@@ -105,6 +125,8 @@ function UploadTemplatePage() {
                 })
                 break;
             case 'dropzone-file-image':
+                console.log(
+                )
                 setFormData({
                     ...formData,
                     imageFiles: e.target.files
@@ -126,6 +148,13 @@ function UploadTemplatePage() {
                 break;
         }
     }
+
+    const resizeFile = (file) => new Promise(resolve => {
+        Resizer.imageFileResizer(file, 1280, 1280, 'JPEG', 60, 0,
+        uri => {
+        resolve(uri);
+        }, 'base64' );
+    });
 
     return(
     <div className="mx-auto w-3/5">
