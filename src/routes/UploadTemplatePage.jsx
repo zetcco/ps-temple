@@ -66,9 +66,7 @@ function UploadTemplatePage() {
     }
 
     const getTags = async () => {
-        if (Object.keys(allTags).length === 0) {
-            await getAllTags();
-        }
+        await getAllTags();
     }
 
     const quickAddTag = (value) => {

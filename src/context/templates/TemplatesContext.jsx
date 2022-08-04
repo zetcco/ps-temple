@@ -115,6 +115,8 @@ export const TemplatesProvider = ({children}) => {
 
             await addDoc(collection(db, "templates"), submitData);
 
+            setUploadProgress(0);
+
             toast.success('Submission successful');
         } catch (error) {
             console.log(error);
