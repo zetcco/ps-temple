@@ -17,6 +17,7 @@ export const TemplatesProvider = ({children}) => {
     const [ lastQuery, setLastQuery ] = useState();
     const [ lastFetched, setLastFetched ] = useState();
     const [ showPagination, setShowPagination ] = useState(false);
+    const [ uploadProgress, setUploadProgress ] = useState(0);
 
     useEffect(() => {
         if (templates.length === 0)
@@ -155,7 +156,7 @@ export const TemplatesProvider = ({children}) => {
                 (snapshot) => {
                     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('Upload is ' + progress + '% done');
+                    setUploadProgress(progress);
                 }, 
                 (error) => {
                     reject(error) 
@@ -197,7 +198,7 @@ export const TemplatesProvider = ({children}) => {
     }
 
     return (
-        <TemplatesContext.Provider value={{ templates, isFetching, setTemplates, getTemplates, getMoreTemplates, uploadTemplate, showPagination, allTags, getAllTags, updateAllTags }}>
+        <TemplatesContext.Provider value={{ templates, isFetching, setTemplates, getTemplates, getMoreTemplates, uploadTemplate, showPagination, allTags, getAllTags, updateAllTags, uploadProgress }}>
             {children}
         </TemplatesContext.Provider>
     )

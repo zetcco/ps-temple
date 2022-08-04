@@ -16,7 +16,7 @@ function UploadTemplatePage() {
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { uploadTemplate, allTags, getAllTags, isFetching } = useContext(TemplatesContext);
+    const { uploadTemplate, allTags, getAllTags, isFetching, uploadProgress } = useContext(TemplatesContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -72,7 +72,6 @@ function UploadTemplatePage() {
     }
 
     const quickAddTag = (value) => {
-        console.log(value);
         setFormData({
             ...formData,
             tags: (formData.tags.length !== 0 ? `${formData.tags}, ${value}` : value)
@@ -117,7 +116,10 @@ function UploadTemplatePage() {
                 {formData.imageFiles.length > 0 && [...formData.imageFiles].map(
                     (file, index) => {
                         return (
-                            <span className="label-text" key={index}>{file.name}</span>
+                            <div className="flex space-x-4 items-center" key={index}>
+                                <span className="label-text">{file.name}</span>
+                                <progress className="progress progress-primary inline-flex align-middle" value={uploadProgress} max="100"></progress>
+                            </div>
                         )
                     }
                 )}
@@ -142,10 +144,14 @@ function UploadTemplatePage() {
                     <span className="label-text">Google Drive URL</span>
                 </label>
                 <input type="text" placeholder="Paste URL here" className="input input-bordered w-full" id='gdrive' value={formData.gdriveLink} onChange={onMutate}/>
-
                 {isLoading === false ? 
                     (
-                        <button className="btn btn-primary btn-block mt-5" type="submit">Submit</button>
+                        <button className="btn btn-primary btn-block mt-5" type="submit" disabled={
+                            formData.title === '' ||
+                            formData.tags === '' ||
+                            formData.imageFiles.length === 0 ||
+                            formData.gdriveLink === ''
+                        }>Submit</button>
                     ) : (
                         <button className="btn loading mt-5">Submitting</button>
                     )
