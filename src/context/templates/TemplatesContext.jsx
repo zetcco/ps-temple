@@ -97,6 +97,7 @@ export const TemplatesProvider = ({children}) => {
 
             const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase()));
 
+            // Set new tags (if there are any) to all tags collection
             await updateAllTags(tags);
 
             // Set other required data

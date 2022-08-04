@@ -95,7 +95,7 @@ function UploadTemplatePage() {
                     <div className="dropdown ml-2">
                         <label tabIndex="0" className="btn btn-primary text-xl" onClick={getTags}>+</label>
                         <div tabIndex="0" className="dropdown-content p-2 shadow bg-base-100 rounded-box w-80 h-40 overflow-auto">
-                            {isFetching ? <p>True</p> : Object.keys(allTags).map((tag, index) => {
+                            {isFetching ? <p>Loading tags..</p> : Object.keys(allTags).map((tag, index) => {
                                 return (<Tag value={tag} key={index} className={"m-1"} onClick={() => quickAddTag(tag)}/>)
                             } )}
                         </div>
