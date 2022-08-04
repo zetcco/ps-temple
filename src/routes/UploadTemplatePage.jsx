@@ -1,12 +1,12 @@
 import { serverTimestamp } from "firebase/firestore";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { auth, storage } from '../firebase.config';
 import { v4 as uuidv4 } from 'uuid';
-import { collection, addDoc } from "firebase/firestore";
-import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
 import Resizer from "react-image-file-resizer";
+import TemplatesContext from "../context/templates/TemplatesContext";
+import Tag from "../components/Tag";
 
 function UploadTemplatePage() {
 
@@ -20,6 +20,8 @@ function UploadTemplatePage() {
     }
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
+
+    const { uploadTemplate, allTags, getAllTags, updateAllTags, isFetching } = useContext(TemplatesContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -47,10 +49,14 @@ function UploadTemplatePage() {
                 return;
             }) : '';
 
+            const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase()));
+
+            await updateAllTags(tags);
+
             // Set other required data
             const submitData = {
                 ...formData,
-                tags: formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())),
+                tags,
                 uploadedBy: auth.currentUser.uid,
                 imageUrls,
                 psdUrl
@@ -59,7 +65,7 @@ function UploadTemplatePage() {
             delete submitData.imageFiles;
             delete submitData.psdFiles;
 
-            await addDoc(collection(db, "templates"), submitData);
+            await uploadTemplate(submitData);
 
             toast.success('Submission successful');
         } catch (error) {
@@ -71,6 +77,7 @@ function UploadTemplatePage() {
         setFormData(initialFormData);
     }
 
+    // Convert data uri into blob data (image data into image)
     const dataURIToBlob = (dataURI) => {
         const splitDataURI = dataURI.split(",");
         const byteString =
@@ -110,6 +117,14 @@ function UploadTemplatePage() {
         });
     }
 
+    // Resize the file
+    const resizeFile = (file) => new Promise(resolve => {
+        Resizer.imageFileResizer(file, 1280, 1280, 'JPEG', 60, 0,
+        uri => {
+        resolve(uri);
+        }, 'base64' );
+    });
+    
     const onMutate = async (e) => {
         switch (e.target.id) { 
             case 'tags':
@@ -149,12 +164,19 @@ function UploadTemplatePage() {
         }
     }
 
-    const resizeFile = (file) => new Promise(resolve => {
-        Resizer.imageFileResizer(file, 1280, 1280, 'JPEG', 60, 0,
-        uri => {
-        resolve(uri);
-        }, 'base64' );
-    });
+    const getTags = async () => {
+        if (Object.keys(allTags).length === 0) {
+            await getAllTags();
+        }
+    }
+
+    const quickAddTag = (value) => {
+        console.log(value);
+        setFormData({
+            ...formData,
+            tags: (formData.tags.length !== 0 ? `${formData.tags}, ${value}` : value)
+        })
+    }
 
     return(
     <div className="mx-auto w-3/5">
@@ -167,7 +189,17 @@ function UploadTemplatePage() {
                 <label className="label">
                     <span className="label-text">Enter Template tags</span>
                 </label>
-                <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} value={formData.tags} required/>
+                <div className="flex">
+                    <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} value={formData.tags} required/>
+                    <div className="dropdown ml-2">
+                        <label tabIndex="0" className="btn btn-primary text-xl" onClick={getTags}>+</label>
+                        <div tabIndex="0" className="dropdown-content p-2 shadow bg-base-100 rounded-box w-80 h-40 overflow-auto">
+                            {isFetching ? <p>True</p> : Object.keys(allTags).map((tag, index) => {
+                                return (<Tag value={tag} key={index} className={"m-1"} onClick={() => quickAddTag(tag)}/>)
+                            } )}
+                        </div>
+                    </div>
+                </div>
                 <label className="label">
                     <span className="label-text">Upload images</span>
                 </label>

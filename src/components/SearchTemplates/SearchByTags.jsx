@@ -25,10 +25,18 @@ function SearchByTags() {
         e.preventDefault();
         getTemplates("tags", "array-contains-any", searchTags);
     }
+
+    const quickTagSearch = (value) => {
+        getTemplates("tags", "array-contains-any", [value]);
+    }
+
     return(
     <div>
         <div className="grid grid-cols-4">
             <div className="xl:col-span-2 lg:col-span-3 md:col-span-3 col-span-3">
+                {/*<div className="mb-2">
+                    <Tag value={"test"} onClick={() => quickTagSearch("test")}/>
+                </div> */}
                 <form className="grid grid-cols-4" onSubmit={onSubmit}>   
                     <input type="text" id='test' placeholder="Seperate tags by commas" className="input rounded-r-none input-primary col-span-3" onKeyUp={onKeyUp}/>
                     <button className="btn btn-primary rounded-l-none" type="submit">Search</button>
