@@ -1,10 +1,5 @@
 import { serverTimestamp } from "firebase/firestore";
 import { useContext, useState } from "react";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { auth, storage } from '../firebase.config';
-import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
-import Resizer from "react-image-file-resizer";
 import TemplatesContext from "../context/templates/TemplatesContext";
 import Tag from "../components/Tag";
 
@@ -21,109 +16,15 @@ function UploadTemplatePage() {
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { uploadTemplate, allTags, getAllTags, updateAllTags, isFetching } = useContext(TemplatesContext);
+    const { uploadTemplate, allTags, getAllTags, isFetching } = useContext(TemplatesContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
-
         setIsLoading(true);
-
-        try { 
-            // Upload the images
-            const resizedImages = await Promise.all([...formData.imageFiles].map(
-                (image) => resizeFile(image)
-            ));
-            const convertedImages = await Promise.all(resizedImages.map(
-                (image) => dataURIToBlob(image)
-            ));
-            const imageUrls = await Promise.all(
-                convertedImages.map( (image) => uploadFile(image, 'images'))
-            ).catch( () => {
-                console.log('Images did not upload');
-                return;
-            }) 
-
-            // Upload the images
-            const psdUrl = formData.psdFiles.length > 0 ? await uploadFile(formData.psdFiles[0], 'psds').catch( () => {
-                console.log('PSD did not upload');
-                return;
-            }) : '';
-
-            const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase()));
-
-            await updateAllTags(tags);
-
-            // Set other required data
-            const submitData = {
-                ...formData,
-                tags,
-                uploadedBy: auth.currentUser.uid,
-                imageUrls,
-                psdUrl
-            }
-
-            delete submitData.imageFiles;
-            delete submitData.psdFiles;
-
-            await uploadTemplate(submitData);
-
-            toast.success('Submission successful');
-        } catch (error) {
-            console.log(error);
-            toast.error('Error submitting template');
-        }
-
+        await uploadTemplate(formData);
         setIsLoading(false);
         setFormData(initialFormData);
     }
-
-    // Convert data uri into blob data (image data into image)
-    const dataURIToBlob = (dataURI) => {
-        const splitDataURI = dataURI.split(",");
-        const byteString =
-        splitDataURI[0].indexOf("base64") >= 0
-            ? atob(splitDataURI[1])
-            : decodeURI(splitDataURI[1]);
-        const mimeString = splitDataURI[0].split(":")[1].split(";")[0];
-        const ia = new Uint8Array(byteString.length);
-        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-        return new Blob([ia], { type: mimeString });
-    };
-
-    // Upload a sinfle file to the Firebase storage
-    const uploadFile = async (file, type) => {
-        return new Promise((resolve, reject) => {
-            // Upload file and metadata to the object 'images/mountains.jpg'
-            const storageRef = ref(storage, type + '/' + auth.currentUser.uid + '-' + uuidv4() + '-' +  file.name);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-
-            // Listen for state changes, errors, and completion of the upload.
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log('Upload is ' + progress + '% done');
-                }, 
-                (error) => {
-                    reject(error) 
-                }, 
-                () => {
-                    // Upload completed successfully, now we can get the download URL
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        resolve(downloadURL);
-                    });
-                }
-            )
-        });
-    }
-
-    // Resize the file
-    const resizeFile = (file) => new Promise(resolve => {
-        Resizer.imageFileResizer(file, 1280, 1280, 'JPEG', 60, 0,
-        uri => {
-        resolve(uri);
-        }, 'base64' );
-    });
     
     const onMutate = async (e) => {
         switch (e.target.id) { 
