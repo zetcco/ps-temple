@@ -1,5 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import AuthContext from "../authentication/AuthProvider";
+import { createContext, useState } from "react";
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../../firebase.config";
 
@@ -8,24 +7,22 @@ const UserContext = createContext();
 export const UserProvider = ({children}) => {
 
     const [userData, setUserData] = useState();
-    const { authenticatedUser } = useContext(AuthContext);
 
-    useEffect(() => {
-        ( async () => {
-            try {
-                const docRef = doc(db, "users", authenticatedUser.uid);
-                const docSnap = await getDoc(docRef);
-            } catch (error) {
-            }
-        })()
-    }, [authenticatedUser]);
-    
+    const getUser = async (id) => {
+        try {
+            const docRef = doc(db, "users", id);
+            const docSnap = await getDoc(docRef);
+            setUserData(docSnap.data())
+        } catch (error) {
+            //console.log(error);
+        }
+    } 
 
     return (
-        <UserContext.Provider value={{ userData, setUserData }}>
+        <UserContext.Provider value={{ userData, getUser }}>
             {children}
         </UserContext.Provider>
     );
 }
 
-export default UserProvider;
+export default UserContext;

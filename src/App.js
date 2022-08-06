@@ -18,7 +18,7 @@ import SignInPage from './routes/SignInPage';
 import TemplatePage from './routes/TemplatePage';
 import UploadTemplatePage from './routes/UploadTemplatePage';
 import { TemplatesProvider } from './context/templates/TemplatesContext';
-import UserProvider from './context/user/UserContext';
+import { UserProvider } from './context/user/UserContext';
 
 function App() {
   return (

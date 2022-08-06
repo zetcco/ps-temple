@@ -1,4 +1,4 @@
-import { serverTimestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { useContext, useState } from "react";
 import TemplatesContext from "../context/templates/TemplatesContext";
 import Tag from "../components/Tag";
@@ -10,7 +10,7 @@ function UploadTemplatePage() {
         tags: [],
         imageFiles: [],
         gdriveLink: '',
-        uploadTime: serverTimestamp()
+        uploadTime: Timestamp.fromDate(new Date())
     }
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);

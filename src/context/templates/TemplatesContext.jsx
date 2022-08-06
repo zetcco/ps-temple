@@ -58,10 +58,11 @@ export const TemplatesProvider = ({children}) => {
             const docSnap = await getDoc(docRef);
             setTemplate(docSnap.data());
         } catch (error) {
-            toast.error('Firebase error');
+            console.log(error);
         }
         setIsFetching(false);
     }
+
     const getMoreTemplates = async () => {
         setIsFetching(true);
         try {

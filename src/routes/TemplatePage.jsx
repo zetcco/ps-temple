@@ -3,17 +3,23 @@ import { useParams } from "react-router-dom";
 import Spinner from "../components/layout/Spinner/Spinner";
 import Tag from "../components/Tag";
 import TemplatesContext from "../context/templates/TemplatesContext";
-
+import UserContext from "../context/user/UserContext";
+import { Timestamp } from "firebase/firestore";
 
 function TemplatePage() {
     const { id } = useParams();
-    const { template, getTemplate, isFetching } = useContext(TemplatesContext);
+    const { template, getTemplate } = useContext(TemplatesContext);
+    const { userData, getUser } = useContext(UserContext)
 
     useEffect(() => {
         getTemplate(id);
     }, []);
 
-    if (template.length === 0 || isFetching) {
+    useEffect(() => {
+        getUser(template.uploadedBy);
+    }, [template])
+
+    if (!userData || template.length === 0) {
         return <Spinner/>
     } else {
         return(
@@ -22,9 +28,11 @@ function TemplatePage() {
                     <img src={template.imageUrls[0]} alt="Album"/>
                 </div>
                 <div className="relative p-7">
-                    <h2 className="card-title">{template.title}</h2>
+                    <h2 className="text-3xl antialiased font-bold">{template.title}</h2>
+                    <h2 className="text-base antialiased mt-6">{userData.email}</h2>
+                    <h2 className="text-base antialiased">{new Date(template.uploadTime.seconds * 1000).toLocaleString()}</h2>
                     <div className="card-actions w-1/2 space-x-2 mt-6">
-                        { template.tags.map((tag) => <Tag value={tag}/>) }
+                        { template.tags.map((tag, index) => <Tag value={tag} key={index}/>) }
                     </div>
                     <div className="absolute bottom-0 right-0 p-7">
                         <button className="btn btn-primary" onClick={() => window.open(template.gdriveLink, '_blank')}>Download</button>
