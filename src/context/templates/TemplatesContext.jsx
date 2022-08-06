@@ -11,6 +11,7 @@ const TemplatesContext = createContext();
 export const TemplatesProvider = ({children}) => {
 
     const [ templates, setTemplates ] = useState([]);
+    const [ template, setTemplate ] = useState([]);
     const [ isFetching, setIsFetching ] = useState(false);
     const [ allTags, setAllTags ] = useState({});
 
@@ -50,6 +51,17 @@ export const TemplatesProvider = ({children}) => {
         setIsFetching(false);
     }
 
+    const getTemplate = async (id) => {
+        setIsFetching(true);
+        try {
+            const docRef = doc(db, "templates", id);
+            const docSnap = await getDoc(docRef);
+            setTemplate(docSnap.data());
+        } catch (error) {
+            toast.error('Firebase error');
+        }
+        setIsFetching(false);
+    }
     const getMoreTemplates = async () => {
         setIsFetching(true);
         try {
@@ -90,13 +102,11 @@ export const TemplatesProvider = ({children}) => {
                 return;
             }) 
 
-            // Upload the psd files
-            const psdUrl = formData.psdFiles.length > 0 ? await uploadFile(formData.psdFiles[0], 'psds').catch( () => {
-                console.log('PSD did not upload');
-                return;
-            }) : '';
+            const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())).filter((item) => {
+                return item !== ""
+            });
 
-            const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase()));
+            console.log(tags);
 
             // Set new tags (if there are any) to all tags collection
             await updateAllTags(tags);
@@ -106,8 +116,7 @@ export const TemplatesProvider = ({children}) => {
                 ...formData,
                 tags,
                 uploadedBy: auth.currentUser.uid,
-                imageUrls,
-                psdUrl
+                imageUrls
             }
 
             delete submitData.imageFiles;
@@ -200,7 +209,19 @@ export const TemplatesProvider = ({children}) => {
     }
 
     return (
-        <TemplatesContext.Provider value={{ templates, isFetching, setTemplates, getTemplates, getMoreTemplates, uploadTemplate, showPagination, allTags, getAllTags, updateAllTags, uploadProgress }}>
+        <TemplatesContext.Provider value={{ templates, 
+                                            isFetching, 
+                                            setTemplates, 
+                                            getTemplates, 
+                                            getMoreTemplates,
+                                            template,
+                                            getTemplate,
+                                            uploadTemplate, 
+                                            showPagination, 
+                                            allTags, 
+                                            getAllTags, 
+                                            updateAllTags, 
+                                            uploadProgress }}>
             {children}
         </TemplatesContext.Provider>
     )
