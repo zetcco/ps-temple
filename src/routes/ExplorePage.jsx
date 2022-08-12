@@ -5,11 +5,12 @@ import TemplatesContext from "../context/templates/TemplatesContext";
 
 function ExplorePage() {
 
-    const { setTemplates } = useContext(TemplatesContext);
+    const { dispatch } = useContext(TemplatesContext);
 
     useEffect(() => {
-        setTemplates([]);
-    }, [setTemplates]);
+        dispatch({ type: 'SET_PAGINATION', payload: false });
+        dispatch({ type: 'CLEAR_TEMPLATES' });
+    }, [dispatch]);
 
     return(
         <div className="my-10">

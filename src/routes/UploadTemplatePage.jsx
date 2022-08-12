@@ -2,6 +2,8 @@ import { Timestamp } from "firebase/firestore";
 import { useContext, useState } from "react";
 import TemplatesContext from "../context/templates/TemplatesContext";
 import Tag from "../components/Tag";
+import { uploadTemplate } from '../context/templates/TemplatesActions';
+import { toast } from "react-toastify";
 
 function UploadTemplatePage() {
 
@@ -14,13 +16,20 @@ function UploadTemplatePage() {
     }
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
+    const [ uploadProgress, setUploadProgress ] = useState(0);
 
-    const { uploadTemplate, allTags, getAllTags, isFetching, uploadProgress } = useContext(TemplatesContext);
+    const { allTags, getAllTags, isFetching } = useContext(TemplatesContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        await uploadTemplate(formData);
+        const uploadStatus = await uploadTemplate(formData, setUploadProgress); // second argument is a callback function to set the progression of the upload
+        if (uploadStatus === true)
+            toast.success('Submission successfull');
+        else {
+            console.log(uploadStatus);
+            toast.error('Error when uploading template');
+        }
         setIsLoading(false);
         setFormData(initialFormData);
     }

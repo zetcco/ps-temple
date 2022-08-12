@@ -1,12 +1,13 @@
 import Tag from "../Tag";
 import { useState, useContext } from "react";
 import TemplatesContext from "../../context/templates/TemplatesContext";
+import { fetchTemplates, templates_per_page } from "../../context/templates/TemplatesActions";
 
 function SearchByTags() {
 
     const [searchTags, setSearchTags] = useState([]);
 
-    const { getTemplates } = useContext(TemplatesContext);
+    const { dispatch } = useContext(TemplatesContext);
 
     const onKeyUp = (e) => {
         if (e.key === ',') {
@@ -21,14 +22,32 @@ function SearchByTags() {
         }));
     }
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        getTemplates("tags", "array-contains-any", searchTags);
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+
+        const query = {field:"tags", condition:"array-contains-any", value:searchTags};
+        dispatch({ type: 'SET_LAST_QUERY', payload: query });
+
+        const { templates, lastFetched } = await fetchTemplates(query);
+
+        dispatch({ type: 'SET_LAST_FETCHED', payload: lastFetched });
+
+        if (templates.length >= templates_per_page) {
+            dispatch({ type: 'SET_PAGINATION', payload: true });
+        }
+        dispatch({ 
+            type: 'GET_TEMPLATES',
+            payload: templates
+        });
+
+        dispatch({ type: 'SET_LOADING', payload: false });
     }
 
-    const quickTagSearch = (value) => {
-        getTemplates("tags", "array-contains-any", [value]);
-    }
+    //const quickTagSearch = (value) => {
+        //getTemplates("tags", "array-contains-any", [value]);
+    //}
 
     return(
     <div>

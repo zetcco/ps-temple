@@ -2,22 +2,24 @@ import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../components/layout/Spinner/Spinner";
 import Tag from "../components/Tag";
+import { fetchTemplate } from "../context/templates/TemplatesActions";
 import TemplatesContext from "../context/templates/TemplatesContext";
 import UserContext from "../context/user/UserContext";
-import { Timestamp } from "firebase/firestore";
 
 function TemplatePage() {
     const { id } = useParams();
-    const { template, getTemplate } = useContext(TemplatesContext);
+    const { template, dispatch } = useContext(TemplatesContext);
     const { userData, getUser } = useContext(UserContext)
 
     useEffect(() => {
-        getTemplate(id);
-    }, []);
-
-    useEffect(() => {
-        getUser(template.uploadedBy);
-    }, [template])
+        ( async () => {
+            dispatch({ type: 'SET_LOADING', payload: true });
+            const template = await fetchTemplate(id);
+            dispatch({ type: 'GET_TEMPLATE', payload: template });
+            getUser(template.uploadedBy);
+            dispatch({ type: 'SET_LOADING', payload: false });
+        })()
+    }, [dispatch, id]);
 
     if (!userData || template.length === 0) {
         return <Spinner/>
