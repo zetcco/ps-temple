@@ -3,7 +3,7 @@ import { db, auth } from "../../firebase.config";
 import { uploadFile } from "./ImageFileHandling";
 
 // Number of teamplates that should be displayed per page
-export const templates_per_page = 5;
+export const templates_per_page = 10;
 
 export const fetchTemplates = async ({field, condition, value}) => {
     const q = query(collection(db, "templates"), where(field, condition, value), orderBy('uploadTime', 'desc'), limit(templates_per_page));

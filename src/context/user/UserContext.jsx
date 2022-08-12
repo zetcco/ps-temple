@@ -14,7 +14,7 @@ export const UserProvider = ({children}) => {
             const docSnap = await getDoc(docRef);
             setUserData(docSnap.data())
         } catch (error) {
-            //console.log(error);
+            console.log(error);
         }
     } 
 

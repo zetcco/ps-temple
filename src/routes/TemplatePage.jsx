@@ -42,9 +42,9 @@ function TemplatePage() {
                     <div className="card-actions w-1/2 space-x-2 mt-6">
                         { template.tags.map((tag, index) => <Tag value={tag} key={index}/>) }
                     </div>
-                    <div className="absolute bottom-0 right-0 p-7">
-                        <button className="btn btn-primary" onClick={() => window.open(template.gdriveLink, '_blank')}>Download</button>
-                    </div>
+                </div>
+                <div className="absolute bottom-0 right-0 p-7">
+                    <button className="btn btn-primary" onClick={() => window.open(template.gdriveLink, '_blank')}>Download</button>
                 </div>
             </div> 
         );
