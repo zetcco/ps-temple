@@ -1,9 +1,10 @@
 import { Timestamp } from "firebase/firestore";
 import { useContext, useState } from "react";
-import TemplatesContext from "../context/templates/TemplatesContext";
 import Tag from "../components/Tag";
 import { uploadTemplate } from '../context/templates/TemplatesActions';
 import { toast } from "react-toastify";
+import TagsContext from "../context/tags/TagsContext";
+import { getAllTags } from '../context/tags/TagsActions';
 
 function UploadTemplatePage() {
 
@@ -18,7 +19,7 @@ function UploadTemplatePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [ uploadProgress, setUploadProgress ] = useState(0);
 
-    const { allTags, getAllTags, isFetching } = useContext(TemplatesContext);
+    const { allTags,  isTagsFetching, tags_dispatcher } = useContext(TagsContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -74,7 +75,10 @@ function UploadTemplatePage() {
     }
 
     const getTags = async () => {
-        await getAllTags();
+        tags_dispatcher({ type: 'SET_LOADING', payload: true });
+        const tags = await getAllTags();
+        tags_dispatcher( { type: 'SET_ALL_TAGS', payload: tags });
+        tags_dispatcher({ type: 'SET_LOADING', payload: false });
     }
 
     const quickAddTag = (value) => {
@@ -100,7 +104,7 @@ function UploadTemplatePage() {
                     <div className="dropdown ml-2">
                         <label tabIndex="0" className="btn btn-primary text-xl" onClick={getTags}>+</label>
                         <div tabIndex="0" className="dropdown-content p-2 shadow bg-base-100 rounded-box w-80 h-40 overflow-auto">
-                            {isFetching ? <p>Loading tags..</p> : Object.keys(allTags).map((tag, index) => {
+                            {isTagsFetching ? <p>Loading tags..</p> : Object.keys(allTags).map((tag, index) => {
                                 return (<Tag value={tag} key={index} className={"m-1"} onClick={() => quickAddTag(tag)}/>)
                             } )}
                         </div>
