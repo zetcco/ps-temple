@@ -24,11 +24,11 @@ function UploadTemplatePage() {
     const onSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        const uploadStatus = await uploadTemplate(formData, setUploadProgress); // second argument is a callback function to set the progression of the upload
-        if (uploadStatus === true)
+        try {
+            await uploadTemplate(formData, setUploadProgress); // second argument is a callback function to set the progression of the upload
             toast.success('Submission successfull');
-        else {
-            console.log(uploadStatus);
+        } catch (error) {
+            console.log(error);
             toast.error('Error when uploading template');
         }
         setIsLoading(false);

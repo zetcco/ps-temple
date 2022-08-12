@@ -2,6 +2,7 @@ import Tag from "../Tag";
 import { useState, useContext } from "react";
 import TemplatesContext from "../../context/templates/TemplatesContext";
 import { fetchTemplates, templates_per_page } from "../../context/templates/TemplatesActions";
+import { toast } from "react-toastify";
 
 function SearchByTags() {
 
@@ -27,20 +28,25 @@ function SearchByTags() {
 
         dispatch({ type: 'SET_LOADING', payload: true });
 
-        const query = {field:"tags", condition:"array-contains-any", value:searchTags};
-        dispatch({ type: 'SET_LAST_QUERY', payload: query });
+        try {
+            const query = {field:"tags", condition:"array-contains-any", value:searchTags};
+            dispatch({ type: 'SET_LAST_QUERY', payload: query });
 
-        const { templates, lastFetched } = await fetchTemplates(query);
+            const { templates, lastFetched } = await fetchTemplates(query);
 
-        dispatch({ type: 'SET_LAST_FETCHED', payload: lastFetched });
+            dispatch({ type: 'SET_LAST_FETCHED', payload: lastFetched });
 
-        if (templates.length >= templates_per_page) {
-            dispatch({ type: 'SET_PAGINATION', payload: true });
+            if (templates.length >= templates_per_page) {
+                dispatch({ type: 'SET_PAGINATION', payload: true });
+            }
+            dispatch({ 
+                type: 'GET_TEMPLATES',
+                payload: templates
+            });
+        } catch (error) {
+            console.log(error);
+            toast.error('Error fetching templates');
         }
-        dispatch({ 
-            type: 'GET_TEMPLATES',
-            payload: templates
-        });
 
         dispatch({ type: 'SET_LOADING', payload: false });
     }

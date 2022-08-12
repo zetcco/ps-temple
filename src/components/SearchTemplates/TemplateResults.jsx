@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { toast } from "react-toastify";
 import { fetchMoreTemplates, templates_per_page } from "../../context/templates/TemplatesActions";
 import TemplatesContext from "../../context/templates/TemplatesContext";
 import Spinner from "../layout/Spinner/Spinner";
@@ -10,10 +11,15 @@ function TemplateResults() {
 
     const handlePagination = async () => {
         dispatch({ type: 'SET_LOADING', payload: true });
-        const { new_templates, new_lastFetched } = await fetchMoreTemplates(lastQuery, lastFetched);
-        dispatch({ type: 'SET_LAST_FETCHED', payload: new_lastFetched});
-        if (templates_per_page > new_templates.length || new_templates.length === 0) dispatch({ type: 'SET_PAGINATION', payload: false });
-        dispatch({ type: 'GET_TEMPLATES', payload: [...templates, ...new_templates]});
+        try {
+            const { new_templates, new_lastFetched } = await fetchMoreTemplates(lastQuery, lastFetched);
+            dispatch({ type: 'SET_LAST_FETCHED', payload: new_lastFetched});
+            if (templates_per_page > new_templates.length || new_templates.length === 0) dispatch({ type: 'SET_PAGINATION', payload: false });
+            dispatch({ type: 'GET_TEMPLATES', payload: [...templates, ...new_templates]});
+        } catch (error) {
+            console.log(error);
+            toast.error('Error fetching more templates');
+        }
         dispatch({ type: 'SET_LOADING', payload: false });
     }
 

@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Spinner from "../components/layout/Spinner/Spinner";
 import Tag from "../components/Tag";
 import { fetchTemplate } from "../context/templates/TemplatesActions";
@@ -14,9 +15,14 @@ function TemplatePage() {
     useEffect(() => {
         ( async () => {
             dispatch({ type: 'SET_LOADING', payload: true });
-            const template = await fetchTemplate(id);
-            dispatch({ type: 'GET_TEMPLATE', payload: template });
-            getUser(template.uploadedBy);
+            try {
+                const template = await fetchTemplate(id);
+                dispatch({ type: 'GET_TEMPLATE', payload: template });
+                getUser(template.uploadedBy);
+            } catch (error) {
+                console.log(error);
+                toast.error('Error fetching template details');
+            }
             dispatch({ type: 'SET_LOADING', payload: false });
         })()
     }, [dispatch, id]);
