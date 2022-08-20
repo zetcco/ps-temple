@@ -76,8 +76,14 @@ function UploadTemplatePage() {
 
     const getTags = async () => {
         tags_dispatcher({ type: 'SET_LOADING', payload: true });
-        const tags = await getAllTags();
-        tags_dispatcher( { type: 'SET_ALL_TAGS', payload: tags });
+        try {
+            const tags = await getAllTags();
+            tags_dispatcher( { type: 'SET_ALL_TAGS', payload: tags });
+        } catch (error) {
+            toast.error('Error fetching tags');
+            console.log(error);
+        }
+        console.log(allTags);
         tags_dispatcher({ type: 'SET_LOADING', payload: false });
     }
 
