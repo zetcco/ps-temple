@@ -203,6 +203,7 @@ function UploadTemplatePage() {
     );
 }
 
+// Fetch parent tags
 const setParentTags = async (dispatcher) => {
     dispatcher({ type: 'SET_LOADING_PARENT_TAGS', payload: true });
     try {
