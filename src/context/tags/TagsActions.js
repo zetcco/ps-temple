@@ -11,7 +11,7 @@ export const getParentTags = async () => {
 // Set new tags to the 'tags' collection if there are any
 export const updateAllTags = async (parentTag, childTags) => {
     const docRef = doc(db, "tags", parentTag);
-    setDoc(docRef, {tags: childTags, usage: increment(0)}, { merge: true }); // Set the above created object, merge with the existing values
+    setDoc(docRef, {tags: [...new Set(childTags)], usage: increment(0)}, { merge: true }); // Set the above created object, merge with the existing values
 }
 
 // Get sub tags of a specified parent tag

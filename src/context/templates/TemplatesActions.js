@@ -48,12 +48,20 @@ export const fetchTemplate = async (id) => {
 export const uploadTemplate = async (formData, progressCallback) => {
     // Upload the images
     const imageUrls = await Promise.all(
-        Array.from(formData.imageFiles).map( (image) => uploadFile(image, 'images', progressCallback))
+        Array.from(formData.imageFiles).map( (image) => {
+            return uploadFile(image, 'images', progressCallback);
+        })
     )
+    
+    // Add tags
     const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())).filter((item) => {
         return item !== ""
     });
 
+    // Add tags using the file name
+    tags.push(...formData.imageFiles[0].name.split(".")[0].split(" "));
+
+    // Determine between new parent tag or not
     if (formData.newParentTag === '') {
         formData = {...formData, tags: tags.push(formData.parentTag)}
         delete formData.parentTag;
@@ -66,7 +74,7 @@ export const uploadTemplate = async (formData, progressCallback) => {
     const submitData = {
         ...formData,
         uploadedBy: auth.currentUser.uid,
-        tags,
+        tags: [...new Set(tags)],
         imageUrls
     }
 
