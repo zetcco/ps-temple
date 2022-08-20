@@ -6,8 +6,10 @@ const TagsContext = createContext();
 export const TagsProvider = ({children}) => {
 
     const init_state = {
-        allTags: [],
-        isFetching: false
+        parentTags: [],
+        fetchingParentTags: false,
+        childTags: [],
+        fetchingChildTags: true
     }
 
     const [state, tags_dispatcher] = useReducer(TagsReducer, init_state);
@@ -15,8 +17,10 @@ export const TagsProvider = ({children}) => {
     return (
         <TagsContext.Provider value={{
                                 tags_dispatcher,
-                                allTags: state.allTags,
-                                isTagsFetching: state.isFetching
+                                parentTags: state.parentTags,
+                                fetchingParentTags: state.fetchingParentTags,
+                                childTags: state.childTags,
+                                fetchingChildTags: state.fetchingChildTags
                             }}    
         > {children} </TagsContext.Provider>
     )

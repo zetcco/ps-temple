@@ -1,19 +1,29 @@
 export default function TagsReducer(state, action) {
     switch (action.type) {
-        case 'SET_ALL_TAGS':
+        case 'SET_PARENT_TAGS':
             return {
                 ...state,
-                allTags: action.payload
+                parentTags: action.payload
             }
-        case 'CLEAR_ALL_TAGS':
+        case 'CLEAR_PARENT_TAGS':
             return {
                 ...state,
-                allTags: []
+                parentTags: []
             }
-        case 'SET_LOADING':
+        case 'SET_CHILD_TAGS':
             return {
                 ...state,
-                isFetching: action.payload
+                childTags: action.payload
+            }
+        case 'SET_LOADING_PARENT_TAGS':
+            return {
+                ...state,
+                fetchingParentTags: action.payload
+            }
+        case 'SET_LOADING_CHILD_TAGS':
+            return {
+                ...state,
+                fetchingChildTags: action.payload
             }
         default:
             break;

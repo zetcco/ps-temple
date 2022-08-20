@@ -50,24 +50,29 @@ export const uploadTemplate = async (formData, progressCallback) => {
     const imageUrls = await Promise.all(
         Array.from(formData.imageFiles).map( (image) => uploadFile(image, 'images', progressCallback))
     )
-
     const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())).filter((item) => {
         return item !== ""
     });
 
-    // Set new tags (if there are any) to all tags collection
-    //await updateAllTags(tags);
+    if (formData.newParentTag === '') {
+        formData = {...formData, tags: tags.push(formData.parentTag)}
+        delete formData.parentTag;
+    } else {
+        formData = {...formData, tags: tags.push(formData.newParentTag)}
+        delete formData.newParentTag;
+    }
 
     // Set other required data
     const submitData = {
         ...formData,
-        tags,
         uploadedBy: auth.currentUser.uid,
+        tags,
         imageUrls
     }
 
     delete submitData.imageFiles;
     delete submitData.psdFiles;
+    delete submitData.parentTag;
 
     await addDoc(collection(db, "templates"), submitData);
 

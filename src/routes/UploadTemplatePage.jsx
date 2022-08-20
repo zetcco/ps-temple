@@ -1,15 +1,17 @@
 import { Timestamp } from "firebase/firestore";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Tag from "../components/Tag";
 import { uploadTemplate } from '../context/templates/TemplatesActions';
 import { toast } from "react-toastify";
 import TagsContext from "../context/tags/TagsContext";
-import { getAllTags } from '../context/tags/TagsActions';
+import { getChildTags, getParentTags, updateAllTags } from '../context/tags/TagsActions';
 
 function UploadTemplatePage() {
 
     const initialFormData =  {
         title: '',
+        parentTag: '',
+        newParentTag: '',
         tags: [],
         imageFiles: [],
         gdriveLink: '',
@@ -19,13 +21,31 @@ function UploadTemplatePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [ uploadProgress, setUploadProgress ] = useState(0);
 
-    const { allTags,  isTagsFetching, tags_dispatcher } = useContext(TagsContext);
+    const { parentTags,  fetchingParentTags, childTags, fetchingChildTags, tags_dispatcher } = useContext(TagsContext);
+
+    useEffect(() => {
+        setParentTags(tags_dispatcher);
+    }, [tags_dispatcher])
+
+    useEffect(() => {
+        setFormData(prevState => {
+            return {...prevState, parentTag: ''}
+        });
+    }, [formData.newParentTag]);
 
     const onSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        try {
+        try {    
+            const tags = formData.tags.split(",").map((tag) => (tag.trim().toLowerCase())).filter((item) => {
+                return item !== ""
+            });
+
             await uploadTemplate(formData, setUploadProgress); // second argument is a callback function to set the progression of the upload
+
+            // Set new tags (if there are any) to all tags collection
+            await updateAllTags((formData.newParentTag !== '' ? formData.newParentTag : formData.parentTag).toLowerCase(), tags); // Either one of parentTag or newParentTag would be a empty string.
+
             toast.success('Submission successfull');
         } catch (error) {
             console.log(error);
@@ -33,6 +53,7 @@ function UploadTemplatePage() {
         }
         setIsLoading(false);
         setFormData(initialFormData);
+        setParentTags(tags_dispatcher);
     }
     
     const onMutate = async (e) => {
@@ -50,8 +71,6 @@ function UploadTemplatePage() {
                 })
                 break;
             case 'dropzone-file-image':
-                console.log(
-                )
                 setFormData({
                     ...formData,
                     imageFiles: e.target.files
@@ -69,22 +88,31 @@ function UploadTemplatePage() {
                     gdriveLink: e.target.value
                 });
                 break;
+            case 'parentTag':
+                setFormData({
+                    ...formData,
+                    parentTag: e.target.value
+                })
+
+                tags_dispatcher({ type: 'SET_LOADING_CHILD_TAGS', payload: true });
+                try {
+                    const tags = await getChildTags(e.target.value);
+                    tags_dispatcher( { type: 'SET_CHILD_TAGS', payload: tags });
+                } catch (error) {
+                    toast.error('Error fetching child tags');
+                    console.log(error);
+                }
+                tags_dispatcher({ type: 'SET_LOADING_CHILD_TAGS', payload: false });
+                break;
+            case 'parentTagType':
+                setFormData({
+                    ...formData,
+                    newParentTag: e.target.value
+                })
+                break;
             default:
                 break;
         }
-    }
-
-    const getTags = async () => {
-        tags_dispatcher({ type: 'SET_LOADING', payload: true });
-        try {
-            const tags = await getAllTags();
-            tags_dispatcher( { type: 'SET_ALL_TAGS', payload: tags });
-        } catch (error) {
-            toast.error('Error fetching tags');
-            console.log(error);
-        }
-        console.log(allTags);
-        tags_dispatcher({ type: 'SET_LOADING', payload: false });
     }
 
     const quickAddTag = (value) => {
@@ -103,18 +131,30 @@ function UploadTemplatePage() {
                 </label>
                 <input type="text" placeholder="Type here" className="input input-bordered w-full" id='title' onChange={onMutate} value={formData.title} required/>
                 <label className="label">
+                    <span className="label-text">Enter Parent Tag</span>
+                </label>
+                <div className="flex">
+                    <select id='parentTag' className="select select-primary w-1/5 mr-2" onChange={onMutate} value={formData.parentTag === '' ? "default" : formData.parentTag} disabled={formData.newParentTag !== ''}>
+                        <option value={"default"} disabled>Select Parent Tag</option>
+                        {fetchingParentTags ? <option>Loading tags..</option> : parentTags.map((tag, index) => {
+                            return (<option key={index}>{tag.id}</option>)
+                        } )}
+                    </select>
+                    <input type="text" placeholder="Or type a new one" className="input input-bordered w-full" id='parentTagType' onChange={onMutate} value={formData.newParentTag}/>
+                </div>
+                <label className="label">
                     <span className="label-text">Enter Template tags</span>
                 </label>
                 <div className="flex">
-                    <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} value={formData.tags} required/>
-                    <div className="dropdown ml-2">
-                        <label tabIndex="0" className="btn btn-primary text-xl" onClick={getTags}>+</label>
+                    <div className="dropdown mx-2">
+                        <label tabIndex="0" className={`btn btn-primary text-xl ${(formData.parentTag === '') && 'btn-disabled'}`}>+</label>
                         <div tabIndex="0" className="dropdown-content p-2 shadow bg-base-100 rounded-box w-80 h-40 overflow-auto">
-                            {isTagsFetching ? <p>Loading tags..</p> : Object.keys(allTags).map((tag, index) => {
+                            {fetchingChildTags ? <p>Loading tags..</p> : childTags.tags.map((tag, index) => {
                                 return (<Tag value={tag} key={index} className={"m-1"} onClick={() => quickAddTag(tag)}/>)
                             } )}
                         </div>
                     </div>
+                    <input type="text" placeholder="Seperate each tag by comma" className="input input-bordered w-full" id='tags' onChange={onMutate} value={formData.tags} required/>
                 </div>
                 <label className="label">
                     <span className="label-text">Upload images</span>
@@ -161,6 +201,18 @@ function UploadTemplatePage() {
     </div>
 
     );
+}
+
+const setParentTags = async (dispatcher) => {
+    dispatcher({ type: 'SET_LOADING_PARENT_TAGS', payload: true });
+    try {
+        const tags = await getParentTags();
+        dispatcher( { type: 'SET_PARENT_TAGS', payload: tags.docs });
+    } catch (error) {
+        toast.error('Error fetching parent tags');
+        console.log(error);
+    }
+    dispatcher({ type: 'SET_LOADING_PARENT_TAGS', payload: false });
 }
 
 export default UploadTemplatePage;

@@ -1,18 +1,22 @@
 import { db } from "../../firebase.config";
-import { increment, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, increment, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 
-export const getAllTags = async () => {
-    const docRef = doc(db, "tags", "tags");
-    const docSnap = await getDoc(docRef);
-    return docSnap.data().tags;
+// Get all the parent tags
+export const getParentTags = async () => {
+    const collRef = collection(db, "tags");
+    const collSnap = await getDocs(collRef);
+    return collSnap;
 }
 
 // Set new tags to the 'tags' collection if there are any
-export const updateAllTags = async (allTags) => {
-    const docRef = doc(db, "tags", "tags");
-    const obj = {};
-    allTags.forEach(element => {
-            obj[element] = increment(0)
-        })
-    setDoc(docRef, {tags: obj}, { merge: true }); // Set the above created object, merge with the existing values
+export const updateAllTags = async (parentTag, childTags) => {
+    const docRef = doc(db, "tags", parentTag);
+    setDoc(docRef, {tags: childTags, usage: increment(0)}, { merge: true }); // Set the above created object, merge with the existing values
+}
+
+// Get sub tags of a specified parent tag
+export const getChildTags = async (parent_tag) => {
+    const docRef = doc(db, "tags", parent_tag);
+    const docSnap = await getDoc(docRef);
+    return docSnap.data();
 }
