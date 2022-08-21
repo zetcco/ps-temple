@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, orderBy, limit, startAfter, doc, getDoc, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, deleteDoc, orderBy, limit, startAfter, doc, getDoc, addDoc } from "firebase/firestore";
 import { db, auth } from "../../firebase.config";
 import { uploadFile } from "./ImageFileHandling";
 
@@ -87,4 +87,8 @@ export const uploadTemplate = async (formData, progressCallback) => {
     progressCallback(0);
 
     return true
+}
+
+export const deleteTemplate = async (templateID) => {
+    await deleteDoc(doc(db, "templates", templateID));
 }

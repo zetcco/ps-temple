@@ -10,6 +10,11 @@ export default function TemplatesReducer(state, action) {
                 ...state,
                 template: action.payload
             }
+        case 'DELETE_TEMPLATE':
+            return {
+                ...state,
+                template: {}
+            }
         case 'CLEAR_TEMPLATES':
             return {
                 ...state,
