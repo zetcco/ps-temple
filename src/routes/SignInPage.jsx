@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import AuthContext from "../context/authentication/AuthProvider";
 
 function SignInPage() {
@@ -16,7 +17,11 @@ function SignInPage() {
     const onSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        await signin(formData.email, formData.password);
+        try {
+            await signin(formData.email, formData.password);
+        } catch (error) {
+            toast.error('Wrong Emai/Password combination');
+        }
         setIsLoading(false);
         navigate('/');
     }
